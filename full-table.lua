@@ -1,5 +1,5 @@
 local Table = {}
-
+-- 
 Table.foreach = function(items, callback)
   for index, item in pairs(items) do
     callback(item, index, items)
