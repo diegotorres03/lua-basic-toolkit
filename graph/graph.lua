@@ -1,79 +1,10 @@
-function Link(params)
-  local instance = {
-    id = "",
-    type = "",
-    source = {},
-    target = {},
-    value = 0,
-    properties = {}
-  }
-  if params then
-    instance.id = params.id
-    instance.properties = params.properties
-    instance.source = params.source
-    instance.target = params.target
-    instance.type = params.type
-    instance.value = params.value
-  end
-  return instance
-end
-
---[[
-  Node class represent each node on the graph
-  each node has a list of links
-]]
-function Node(params)
-  local instance = {
-    id = "",
-    type = "",
-    properties = {},
-    links = {}
-  }
-  if params then
-    instance.id = params.id
-    instance.type = params.type
-    instance.properties = params.properties
-  end
-
-  -- Add a node to anoder node
-  instance.to = function(node, link_type, properties)
-    local link =
-      Link(
-      {
-        source = instance.id,
-        target = node.id,
-        type = link_type or "",
-        properties = properties or {}
-      }
-    )
-    table.insert(instance.links, link)
-  end
-
-  -- check if is a leaf node
-  instance.is_leaf = function()
-    return table.maxn(instance.links) == 0
-  end
-
-  instance.tostring = function()
-    local str = "(%s:%s) =>\n"
-    for i, link in pairs(instance.links) do
-      str = str .. string.format("\t-[%s:%s]->(%s)\n", link.id or "jaja", link.type, link.target)
-    end
-    local id = instance.id
-    local type = instance.type
-    local res_str = string.format(str, id, type, "n", "r", "m", "n", "r", "m", "n", "r", "m")
-    -- print(str)
-    return res_str
-  end
-
-  return instance
-end
+local Graph = {}
 
 -- //////////////////////////////////////////
 -- GRAPH Class
 -- //////////////////////////////////////////
 
-function get_root_nodes(nodes)
+Graph.get_root_nodes = function(nodes)
   local root_nodes = {}
   for node_id, node in pairs(nodes) do
     root_nodes[node_id] = node
@@ -86,7 +17,7 @@ function get_root_nodes(nodes)
   return root_nodes
 end
 
-function find_node(nodes, query)
+Graph.find_node = function(nodes, query)
   local response = {}
   if query and query.type then
     for node_id, node in pairs(nodes) do
@@ -107,7 +38,7 @@ function find_node(nodes, query)
   return response
 end
 
-function Graph(name, template)
+Graph.create = function(name, template)
   local instance = {
     name = "",
     nodes = {},
@@ -135,11 +66,11 @@ function Graph(name, template)
   end
 
   instance.ger_root_nodes = function()
-    return get_root_nodes(instance.nodes)
+    return Graph.get_root_nodes(instance.nodes)
   end
 
   instance.find = function(query)
-    return find_node(instance.nodes, query)
+    return Graph.find_node(instance.nodes, query)
   end
 
   instance.tostring = function()
@@ -153,46 +84,4 @@ function Graph(name, template)
   return instance
 end
 
-local graph = Graph("first")
-
-local node1 =
-  Node(
-  {
-    id = "1234",
-    type = "TestNode",
-    properties = {},
-    links = {}
-  }
-)
-
-local node2 =
-  Node(
-  {
-    id = "2345",
-    type = "TestNode",
-    properties = {},
-    links = {}
-  }
-)
-local node3 =
-  Node(
-  {
-    id = "3456",
-    type = "TestNode",
-    properties = {},
-    links = {}
-  }
-)
-
-graph.add_node(node1)
-graph.add_node(node2)
-graph.add_node(node3)
-
-node1.to(node2, "Child")
-node1.to(node3, "Child")
-
-node3.to(node1, "Child")
-
--- print(graph.name)
-print(graph.tostring())
--- print(node.tostring())
+return Graph
